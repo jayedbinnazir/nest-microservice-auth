@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # DEVELOPMENT ENVIRONMENT
+  app_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        NODE_ENV: dev
+    container_name: nest_dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file:
+      - .env.dev
+    depends_on:
+      postgres_dev:
+        condition: service_healthy
+    networks:
+      - nest_network
+    stdin_open: true  # Enable interactive mode
+    tty: true         # Allocate a pseudo-TTY
+
+  postgres_dev:
+    image: postgres:15-alpine
+    container_name: postgres_dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: nest_dev
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - nest_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped  # Restart policy for development
+    
+  # TEST ENVIRONMENT
+  app_test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+      args:
+        NODE_ENV: test
+    container_name: nest_test
+    env_file:
+      - .env.test
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+    networks:
+      - nest_network
+
+  postgres_test:
+    image: postgres:15-alpine
+    container_name: postgres_test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: nest_test
+    volumes:
+      - pgdata_test:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - nest_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # PRODUCTION ENVIRONMENT
+  app_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        NODE_ENV: prod
+    container_name: nest_prod
+    ports:
+      - "3000:3000"  # Different port if running alongside dev
+    env_file:
+      - .env.prod
+    depends_on:
+      postgres_prod:
+        condition: service_healthy
+    networks:
+      - nest_network
+    restart: always
+
+  postgres_prod:
+    image: postgres:15-alpine
+    container_name: postgres_prod
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: nest_prod
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - nest_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata_dev:
+  pgdata_test:
+  pgdata_prod:
+
+networks:
+  nest_network:
+    driver: bridge

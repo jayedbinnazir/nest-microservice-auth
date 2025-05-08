@@ -1,0 +1,27 @@
+nest g res <module-name>
+
+docker-compose up -d postgres_dev
+
+docker-compose up --force-recreate --renew-anon-volumes --abort-on-container-exit app_dev
+or
+docker-compose up app_dev
+
+
+complete clean up
+docker-compose down -v  # This will remove containers and volumes
+
+
+remove all image , volumes , container
+docker-compose down --volumes --rmi all
+
+
+# 1. Stop and remove all containers, networks, images, and volumes created by docker-compose
+docker-compose down --rmi all --volumes --remove-orphans
+
+# 2. Remove all unused Docker data (dangling volumes, cache, build artifacts)
+docker system prune -a --volumes -f
+
+# 3. Optionally clear any Docker build cache
+docker builder prune -af
+
+

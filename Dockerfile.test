@@ -1,0 +1,21 @@
+# Test Dockerfile
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy all files
+COPY . .
+
+# Environment variables
+ENV NODE_ENV=test
+ENV PORT=3001
+
+# Install test dependencies and run tests
+RUN npm run test
+
+# You might want to run the app in test mode too
+CMD ["npm", "run", "start:test"]

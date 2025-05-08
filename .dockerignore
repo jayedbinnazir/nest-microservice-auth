@@ -1,0 +1,51 @@
+# General ignores
+**/.git
+**/.gitignore
+**/.DS_Store
+**/.vscode
+**/.idea
+**/*.log
+**/.env*.local
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/.cache
+
+# Dependency directories (handled by npm install in Dockerfile)
+**/node_modules
+
+# Build directories
+**/dist
+**/coverage
+**/.nyc_output
+
+# Test artifacts
+**/*.spec.ts
+**/*.test.ts
+**/test/
+**/__tests__/
+
+# Environment files (except the ones we explicitly copy)
+.env
+!.env.dev
+!.env.test
+!.env.prod
+
+# Documentation
+**/README.md
+**/CHANGELOG.md
+**/LICENSE
+
+# Editor/IDE specific files
+**/*.swp
+**/*.swo
+**/.editorconfig
+
+# CI/CD files
+**/.github
+**/.circleci
+**/.travis.yml
+
+# Docker compose files (optional - include if you don't want them copied)
+# !docker-compose.yml
+# !Dockerfile*
